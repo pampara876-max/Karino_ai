@@ -593,3 +593,5 @@ section, header, footer{
 @media (max-width:820px){
   .lang{margin-left:auto;}
 }
+
+.ws-output p{white-space:pre-wrap; overflow-wrap:anywhere;}

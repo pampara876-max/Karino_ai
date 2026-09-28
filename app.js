@@ -80,6 +80,7 @@ const RU_FALLBACK = {
   'ws.out.empty': 'Результат появится здесь.',
   'ws.out.needTask': 'Опишите задачу, чтобы начать.',
   'ws.out.noCredits': 'Кредиты закончились. Пополните баланс, чтобы продолжить.',
+  'ws.out.aiError': 'ИИ сейчас недоступен (возможно, исчерпан дневной лимит). Показан демо-ответ:',
   'ws.run': 'Сгенерировать',
   'ws.running': 'Генерирую…'
 };
@@ -96,6 +97,10 @@ const creditsCount = document.getElementById('credits-count');
 let activeTool = 'content';
 let credits = 128;
 let wsBusy = false;
+
+// Backend URL lives in config.js. Empty or missing file = demo mode.
+let API_URL = '';
+import('./config.js').then(m => { API_URL = m.API_URL || ''; }).catch(() => { /* demo mode */ });
 
 // Output area: either a placeholder message (grey) or a result (plain text).
 function showPlaceholder(key) {
@@ -133,8 +138,8 @@ wsRun?.addEventListener('click', () => {
   wsRun.textContent = wsText('ws.running');
   wsRun.disabled = true;
 
-  setTimeout(() => {
-    showResult(wsText('ws.resp.' + activeTool));
+  const finish = (text) => {
+    showResult(text);
     credits = Math.max(0, credits - 4);
     creditsCount.textContent = credits;
 
@@ -146,7 +151,25 @@ wsRun?.addEventListener('click', () => {
     wsBusy = false;
     wsRun.textContent = wsText('ws.run');
     wsRun.disabled = false;
-  }, 900);
+  };
+  const demo = () => wsText('ws.resp.' + activeTool);
+
+  if (API_URL) {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 30000);
+    fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tool: activeTool, prompt: task, lang: currentLocale }),
+      signal: ctrl.signal
+    })
+      .then(r => (r.ok ? r.json() : Promise.reject(new Error('http ' + r.status))))
+      .then(d => finish(d && d.text ? d.text : wsText('ws.out.aiError') + '\n\n' + demo()))
+      .catch(() => finish(wsText('ws.out.aiError') + '\n\n' + demo()))
+      .finally(() => clearTimeout(timer));
+  } else {
+    setTimeout(() => finish(demo()), 900);
+  }
 });
 
 /* -----------------------------------------------------------
