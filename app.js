@@ -8,6 +8,8 @@
    by dropping a matching object into LOCALES and switching
    document.documentElement.lang)
 ----------------------------------------------------------- */
+document.documentElement.classList.add('js');
+
 const LOCALES = {
   ru: { name: 'RU' }
   // es: { name: 'ES' },
@@ -39,6 +41,37 @@ burger?.addEventListener('click', () => {
   const open = burger.getAttribute('aria-expanded') === 'true';
   burger.setAttribute('aria-expanded', String(!open));
   navLinks?.classList.toggle('is-open');
+});
+
+navLinks?.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+  navLinks.classList.remove('is-open');
+  burger?.setAttribute('aria-expanded', 'false');
+}));
+
+/* Reveal on scroll (only cards and steps, once) */
+const revealTargets = document.querySelectorAll('.feature-card, .step, .workspace__panel, .cta h2, .cta .btn');
+revealTargets.forEach((el, i) => {
+  el.classList.add('reveal');
+  el.style.setProperty('--d', (i % 3) * 0.08 + 's');
+});
+if ('IntersectionObserver' in window) {
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('is-visible'); io.unobserve(e.target); }
+    });
+  }, { threshold: 0.15 });
+  revealTargets.forEach(el => io.observe(el));
+} else {
+  revealTargets.forEach(el => el.classList.add('is-visible'));
+}
+
+/* Cursor / touch spotlight on feature cards */
+document.querySelectorAll('.feature-card').forEach(card => {
+  card.addEventListener('pointermove', (e) => {
+    const r = card.getBoundingClientRect();
+    card.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+    card.style.setProperty('--my', (e.clientY - r.top) + 'px');
+  }, { passive: true });
 });
 
 /* -----------------------------------------------------------
@@ -210,6 +243,29 @@ wsRun?.addEventListener('click', () => {
   particles2.scale.setScalar(1.6);
   scene.add(particles2);
 
+  // ---- glowing core (wireframe shell + faceted inner crystal) -------
+  const core = new THREE.Group();
+  const shell = new THREE.Mesh(
+    new THREE.IcosahedronGeometry(2.4, tier === 'low' ? 0 : 1),
+    new THREE.MeshBasicMaterial({ color: 0xa855f7, wireframe: true, transparent: true, opacity: 0.28 })
+  );
+  const crystal = new THREE.Mesh(
+    new THREE.IcosahedronGeometry(1.25, 0),
+    new THREE.MeshStandardMaterial({
+      color: 0x1c1729, emissive: 0x6d28d9, emissiveIntensity: 0.8,
+      metalness: 0.85, roughness: 0.22, flatShading: true
+    })
+  );
+  core.add(shell, crystal);
+  scene.add(core);
+
+  function placeCore() {
+    const wide = window.innerWidth > 900;
+    core.position.set(wide ? 4.2 : 0, wide ? 0.4 : 3.6, -4);
+    core.scale.setScalar(wide ? 1 : 0.7);
+  }
+  placeCore();
+
   // ---- lighting -----------------------------------------------------
   const ambient = new THREE.AmbientLight(0x1c1729, 1.2);
   scene.add(ambient);
@@ -242,6 +298,7 @@ wsRun?.addEventListener('click', () => {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
+    placeCore();
   }
   window.addEventListener('resize', onResize);
 
@@ -251,6 +308,15 @@ wsRun?.addEventListener('click', () => {
     isRunning = document.visibilityState === 'visible';
     if (isRunning) requestAnimationFrame(animate);
   });
+
+  // ---- scroll-linked camera ------------------------------------------
+  let scrollTarget = 0, scrollSmooth = 0;
+  function readScroll() {
+    const max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+    scrollTarget = Math.min(1, window.scrollY / max);
+  }
+  window.addEventListener('scroll', readScroll, { passive: true });
+  readScroll();
 
   // ---- render loop ------------------------------------------------------
   const clock = new THREE.Clock();
@@ -269,11 +335,23 @@ wsRun?.addEventListener('click', () => {
       rimLight.position.x = -8 * Math.cos(t * 0.15 + 2);
     }
 
+    scrollSmooth += (scrollTarget - scrollSmooth) * 0.05;
+    if (!prefersReducedMotion) {
+      shell.rotation.x = t * 0.12 + scrollSmooth * 3;
+      shell.rotation.y = t * 0.18;
+      crystal.rotation.y = -t * 0.25;
+      crystal.rotation.x = t * 0.1;
+      crystal.material.emissiveIntensity = 0.7 + Math.sin(t * 1.4) * 0.25;
+    }
+    particles.rotation.x = scrollSmooth * 0.6;
+    core.position.y += ((window.innerWidth > 900 ? 0.4 : 3.6) + scrollSmooth * 5 - core.position.y) * 0.05;
+
     pointer.x += (targetPointer.x - pointer.x) * 0.04;
     pointer.y += (targetPointer.y - pointer.y) * 0.04;
 
     camera.position.x = pointer.x * 1.4;
-    camera.position.y = -pointer.y * 1.0;
+    camera.position.y = -pointer.y * 1.0 - scrollSmooth * 2;
+    camera.position.z = 12 - scrollSmooth * 3;
     camera.lookAt(0, 0, -6);
 
     renderer.render(scene, camera);
