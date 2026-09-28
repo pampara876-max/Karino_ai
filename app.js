@@ -1,29 +1,20 @@
 /* ===========================================================
    KARINO AI — app.js
-   Cinematic Three.js background + UI interactions + i18n stub
+   Cinematic Three.js background + UI interactions + i18n
    =========================================================== */
 
 /* -----------------------------------------------------------
-   0. i18n scaffold (ru is shipped; es/en can be added later
-   by dropping a matching object into LOCALES and switching
-   document.documentElement.lang)
+   0. i18n — dictionaries live in i18n.js (ru / es / en).
+   The page always opens in Russian unless the visitor has
+   chosen another language before (saved in this browser).
+   If i18n.js fails to load, the page simply stays in Russian.
 ----------------------------------------------------------- */
 document.documentElement.classList.add('js');
 
-const LOCALES = {
-  ru: { name: 'RU' }
-  // es: { name: 'ES' },
-  // en: { name: 'EN' },
-};
+let I18N = null;
 let currentLocale = 'ru';
-document.getElementById('lang-switch')?.addEventListener('click', () => {
-  // Placeholder: cycles through whatever locales are registered above.
-  const keys = Object.keys(LOCALES);
-  const next = keys[(keys.indexOf(currentLocale) + 1) % keys.length];
-  currentLocale = next;
-  document.getElementById('lang-switch').textContent = LOCALES[next].name;
-  // Real translation swap would happen here once es/en copy exists.
-});
+const tr = (key, fallback = '') =>
+  (I18N && I18N[currentLocale] && I18N[currentLocale][key]) || fallback;
 
 /* -----------------------------------------------------------
    1. Nav: scroll shadow, smooth-scroll buttons, mobile burger
@@ -77,18 +68,22 @@ document.querySelectorAll('.feature-card').forEach(card => {
 /* -----------------------------------------------------------
    2. AI Workspace mock — local only, no network calls
 ----------------------------------------------------------- */
-const TOOL_LABELS = {
-  content: 'Генерация текста',
-  video: 'Создание видео',
-  image: 'Работа с изображениями',
-  automate: 'Автоматизация'
+const RU_FALLBACK = {
+  'ws.heading.content': 'Генерация текста',
+  'ws.heading.video': 'Создание видео',
+  'ws.heading.image': 'Работа с изображениями',
+  'ws.heading.automate': 'Автоматизация',
+  'ws.resp.content': 'Черновик готов: заголовок, три абзаца и призыв к действию — можно редактировать прямо здесь.',
+  'ws.resp.video': 'Раскадровка на 5 сцен собрана. Рендер сохранится в истории после подтверждения.',
+  'ws.resp.image': 'Сгенерировано 4 варианта обложки в выбранном стиле. Выберите лучший вариант.',
+  'ws.resp.automate': 'Сценарий автоматизации настроен: задача будет выполняться по расписанию.',
+  'ws.out.empty': 'Результат появится здесь.',
+  'ws.out.needTask': 'Опишите задачу, чтобы начать.',
+  'ws.out.noCredits': 'Кредиты закончились. Пополните баланс, чтобы продолжить.',
+  'ws.run': 'Сгенерировать',
+  'ws.running': 'Генерирую…'
 };
-const MOCK_RESPONSES = {
-  content: 'Черновик готов: заголовок, три абзаца и призыв к действию — можно редактировать прямо здесь.',
-  video: 'Раскадровка на 5 сцен собрана. Рендер сохранится в истории после подтверждения.',
-  image: 'Сгенерировано 4 варианта обложки в выбранном стиле. Выберите лучший вариант.',
-  automate: 'Сценарий автоматизации настроен: задача будет выполняться по расписанию.'
-};
+const wsText = (key) => tr(key, RU_FALLBACK[key] || '');
 
 const wsTools = document.querySelectorAll('.ws-tool');
 const wsTitle = document.getElementById('ws-title');
@@ -100,33 +95,46 @@ const creditsCount = document.getElementById('credits-count');
 
 let activeTool = 'content';
 let credits = 128;
+let wsBusy = false;
+
+// Output area: either a placeholder message (grey) or a result (plain text).
+function showPlaceholder(key) {
+  wsOutput.innerHTML = '';
+  const p = document.createElement('p');
+  p.className = 'ws-output__placeholder';
+  p.dataset.i18n = key;
+  p.textContent = wsText(key);
+  wsOutput.appendChild(p);
+}
+function showResult(text) {
+  wsOutput.innerHTML = '';
+  const p = document.createElement('p');
+  p.textContent = text;
+  wsOutput.appendChild(p);
+}
 
 wsTools.forEach(tool => {
   tool.addEventListener('click', () => {
-    wsTools.forEach(t => t.classList.remove('is-active'));
+    wsTools.forEach(other => other.classList.remove('is-active'));
     tool.classList.add('is-active');
     activeTool = tool.dataset.tool;
-    wsTitle.textContent = TOOL_LABELS[activeTool];
-    wsOutput.innerHTML = '<p class="ws-output__placeholder">Результат появится здесь.</p>';
+    wsTitle.textContent = wsText('ws.heading.' + activeTool);
+    showPlaceholder('ws.out.empty');
   });
 });
 
 wsRun?.addEventListener('click', () => {
+  if (wsBusy) return;
   const task = wsInput.value.trim();
-  if (!task) {
-    wsOutput.innerHTML = '<p class="ws-output__placeholder">Опишите задачу, чтобы начать.</p>';
-    return;
-  }
-  if (credits <= 0) {
-    wsOutput.innerHTML = '<p class="ws-output__placeholder">Кредиты закончились. Пополните баланс, чтобы продолжить.</p>';
-    return;
-  }
+  if (!task) { showPlaceholder('ws.out.needTask'); return; }
+  if (credits <= 0) { showPlaceholder('ws.out.noCredits'); return; }
 
-  wsRun.textContent = 'Генерирую…';
+  wsBusy = true;
+  wsRun.textContent = wsText('ws.running');
   wsRun.disabled = true;
 
   setTimeout(() => {
-    wsOutput.innerHTML = `<p>${MOCK_RESPONSES[activeTool]}</p>`;
+    showResult(wsText('ws.resp.' + activeTool));
     credits = Math.max(0, credits - 4);
     creditsCount.textContent = credits;
 
@@ -135,10 +143,55 @@ wsRun?.addEventListener('click', () => {
     historyList.prepend(li);
     while (historyList.children.length > 6) historyList.removeChild(historyList.lastChild);
 
-    wsRun.textContent = 'Сгенерировать';
+    wsBusy = false;
+    wsRun.textContent = wsText('ws.run');
     wsRun.disabled = false;
   }, 900);
 });
+
+/* -----------------------------------------------------------
+   2b. Language switcher (RU / ES / EN)
+----------------------------------------------------------- */
+function applyLang(lang) {
+  if (!I18N || !I18N[lang]) return;
+  currentLocale = lang;
+  document.documentElement.lang = lang;
+
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const v = tr(el.dataset.i18n); if (v) el.textContent = v;
+  });
+  document.querySelectorAll('[data-i18n-html]').forEach(el => {
+    const v = tr(el.dataset.i18nHtml); if (v) el.innerHTML = v; // trusted, written in i18n.js
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const v = tr(el.dataset.i18nPlaceholder); if (v) el.placeholder = v;
+  });
+  document.querySelectorAll('[data-i18n-aria]').forEach(el => {
+    const v = tr(el.dataset.i18nAria); if (v) el.setAttribute('aria-label', v);
+  });
+
+  document.title = tr('meta.title', document.title);
+  document.querySelector('meta[name="description"]')?.setAttribute('content', tr('meta.description'));
+
+  document.querySelectorAll('.lang [data-lang]').forEach(b =>
+    b.classList.toggle('is-active', b.dataset.lang === lang));
+
+  // keep the workspace headline in sync with the active tool
+  wsTitle.textContent = wsText('ws.heading.' + activeTool);
+  if (wsBusy) wsRun.textContent = wsText('ws.running');
+  try { localStorage.setItem('karino-lang', lang); } catch (e) { /* private mode */ }
+}
+
+document.querySelectorAll('.lang [data-lang]').forEach(btn => {
+  btn.addEventListener('click', () => applyLang(btn.dataset.lang));
+});
+
+import('./i18n.js').then(mod => {
+  I18N = mod.I18N;
+  let saved = null;
+  try { saved = localStorage.getItem('karino-lang'); } catch (e) { /* ignore */ }
+  if (saved && I18N[saved] && saved !== 'ru') applyLang(saved);
+}).catch(() => { /* stays in Russian */ });
 
 /* -----------------------------------------------------------
    3. Cinematic Three.js background

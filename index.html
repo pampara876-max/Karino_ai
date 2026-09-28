@@ -38,13 +38,18 @@
       <span class="nav__mark">K</span>
       <span class="nav__word">Karino <em>AI</em></span>
     </a>
-    <nav class="nav__links" aria-label="Основная навигация">
-      <a href="#features">Возможности</a>
-      <a href="#how">Как это работает</a>
-      <a href="#workspace">AI Workspace</a>
+    <nav class="nav__links" aria-label="Основная навигация" data-i18n-aria="nav.aria">
+      <a href="#features" data-i18n="nav.features">Возможности</a>
+      <a href="#how" data-i18n="nav.how">Как это работает</a>
+      <a href="#workspace" data-i18n="nav.workspace">AI Workspace</a>
     </nav>
-    <button class="nav__cta" data-scroll="#cta">Начать</button>
-    <button class="nav__burger" id="burger" aria-label="Меню" aria-expanded="false">
+    <div class="lang" role="group" aria-label="Язык" data-i18n-aria="nav.lang">
+      <button type="button" data-lang="ru" class="is-active">RU</button>
+      <button type="button" data-lang="es">ES</button>
+      <button type="button" data-lang="en">EN</button>
+    </div>
+    <button class="nav__cta" data-scroll="#cta" data-i18n="nav.start">Начать</button>
+    <button class="nav__burger" id="burger" aria-label="Меню" data-i18n-aria="nav.menu" aria-expanded="false">
       <span></span><span></span><span></span>
     </button>
   </div>
@@ -54,65 +59,65 @@
 <section class="hero" id="top">
   <div class="hero__content">
     <p class="hero__kicker">Karino AI</p>
-    <h1 class="hero__title">
+    <h1 class="hero__title" data-i18n-html="hero.title.html">
       Создавай. <span>Автоматизируй.</span> Масштабируй.
     </h1>
-    <p class="hero__subtitle">
+    <p class="hero__subtitle" data-i18n="hero.subtitle">
       Инструменты искусственного интеллекта для создания контента, автоматизации и развития бизнеса.
     </p>
     <div class="hero__actions">
-      <button class="btn btn--primary" data-scroll="#cta">Попробовать бесплатно</button>
-      <button class="btn btn--ghost" data-scroll="#features">Узнать больше</button>
+      <button class="btn btn--primary" data-scroll="#cta" data-i18n="hero.cta1">Попробовать бесплатно</button>
+      <button class="btn btn--ghost" data-scroll="#features" data-i18n="hero.cta2">Узнать больше</button>
     </div>
   </div>
-  <button class="hero__scroll" data-scroll="#features" aria-label="Прокрутить вниз">
+  <button class="hero__scroll" data-scroll="#features" aria-label="Прокрутить вниз" data-i18n-aria="hero.scroll.aria">
     <span class="hero__scroll-line"></span>
-    <span class="hero__scroll-text">Прокрутите</span>
+    <span class="hero__scroll-text" data-i18n="hero.scroll">Прокрутите</span>
   </button>
 </section>
 
 <!-- ============ FEATURES ============ -->
 <section class="features" id="features">
   <div class="section-head">
-    <h2>Возможности</h2>
-    <p>Набор инструментов, который растёт вместе с вашими задачами.</p>
+    <h2 data-i18n="features.title">Возможности</h2>
+    <p data-i18n="features.sub">Набор инструментов, который растёт вместе с вашими задачами.</p>
   </div>
 
   <div class="feature-grid">
     <article class="feature-card feature-card--wide" data-tilt>
       <div class="feature-card__icon" data-icon="content"></div>
-      <h3>Генерация контента</h3>
-      <p>Тексты, посты и сценарии — от идеи до готового материала за минуты.</p>
+      <h3 data-i18n="f1.title">Генерация контента</h3>
+      <p data-i18n="f1.text">Тексты, посты и сценарии — от идеи до готового материала за минуты.</p>
     </article>
 
     <article class="feature-card" data-tilt>
       <div class="feature-card__icon" data-icon="video"></div>
-      <h3>Создание видео</h3>
-      <p>Ролики для соцсетей без монтажа и лишних программ.</p>
+      <h3 data-i18n="f2.title">Создание видео</h3>
+      <p data-i18n="f2.text">Ролики для соцсетей без монтажа и лишних программ.</p>
     </article>
 
     <article class="feature-card" data-tilt>
       <div class="feature-card__icon" data-icon="image"></div>
-      <h3>Работа с изображениями</h3>
-      <p>Генерация, обработка и адаптация визуалов под любой формат.</p>
+      <h3 data-i18n="f3.title">Работа с изображениями</h3>
+      <p data-i18n="f3.text">Генерация, обработка и адаптация визуалов под любой формат.</p>
     </article>
 
     <article class="feature-card" data-tilt>
       <div class="feature-card__icon" data-icon="automate"></div>
-      <h3>Автоматизация</h3>
-      <p>Повторяющиеся задачи выполняются сами, пока вы заняты главным.</p>
+      <h3 data-i18n="f4.title">Автоматизация</h3>
+      <p data-i18n="f4.text">Повторяющиеся задачи выполняются сами, пока вы заняты главным.</p>
     </article>
 
     <article class="feature-card feature-card--wide" data-tilt>
       <div class="feature-card__icon" data-icon="assistant"></div>
-      <h3>AI-помощник</h3>
-      <p>Отвечает на вопросы, помогает с задачами и учится на ваших данных.</p>
+      <h3 data-i18n="f5.title">AI-помощник</h3>
+      <p data-i18n="f5.text">Отвечает на вопросы, помогает с задачами и учится на ваших данных.</p>
     </article>
 
     <article class="feature-card" data-tilt>
       <div class="feature-card__icon" data-icon="business"></div>
-      <h3>Инструменты для бизнеса</h3>
-      <p>Аналитика, отчёты и планирование — в одном месте.</p>
+      <h3 data-i18n="f6.title">Инструменты для бизнеса</h3>
+      <p data-i18n="f6.text">Аналитика, отчёты и планирование — в одном месте.</p>
     </article>
   </div>
 </section>
@@ -120,25 +125,25 @@
 <!-- ============ HOW IT WORKS ============ -->
 <section class="how" id="how">
   <div class="section-head">
-    <h2>Как это работает</h2>
-    <p>Три шага между идеей и результатом.</p>
+    <h2 data-i18n="how.title">Как это работает</h2>
+    <p data-i18n="how.sub">Три шага между идеей и результатом.</p>
   </div>
 
   <ol class="steps">
     <li class="step">
       <span class="step__num">01</span>
-      <h3>Выбираешь инструмент</h3>
-      <p>Открой нужный модуль в рабочем пространстве Karino AI.</p>
+      <h3 data-i18n="s1.title">Выбираешь инструмент</h3>
+      <p data-i18n="s1.text">Открой нужный модуль в рабочем пространстве Karino AI.</p>
     </li>
     <li class="step">
       <span class="step__num">02</span>
-      <h3>Описываешь задачу</h3>
-      <p>Сформулируй, что нужно получить — своими словами.</p>
+      <h3 data-i18n="s2.title">Описываешь задачу</h3>
+      <p data-i18n="s2.text">Сформулируй, что нужно получить — своими словами.</p>
     </li>
     <li class="step">
       <span class="step__num">03</span>
-      <h3>Получаешь результат</h3>
-      <p>Готовый материал появляется в истории — забирай и используй.</p>
+      <h3 data-i18n="s3.title">Получаешь результат</h3>
+      <p data-i18n="s3.text">Готовый материал появляется в истории — забирай и используй.</p>
     </li>
   </ol>
 </section>
@@ -146,8 +151,8 @@
 <!-- ============ AI WORKSPACE (mock) ============ -->
 <section class="workspace" id="workspace">
   <div class="section-head">
-    <h2>AI Workspace</h2>
-    <p>Так будет выглядеть твоё рабочее пространство.</p>
+    <h2 data-i18n="ws.title">AI Workspace</h2>
+    <p data-i18n="ws.sub">Так будет выглядеть твоё рабочее пространство.</p>
   </div>
 
   <div class="workspace__panel">
@@ -155,22 +160,22 @@
       <div class="ws-sidebar__profile">
         <div class="ws-avatar">К</div>
         <div>
-          <div class="ws-name">Гость</div>
-          <div class="ws-credits"><span id="credits-count">128</span> кредитов</div>
+          <div class="ws-name" data-i18n="ws.guest">Гость</div>
+          <div class="ws-credits"><span id="credits-count">128</span> <span data-i18n="ws.credits">кредитов</span></div>
         </div>
       </div>
       <nav class="ws-tools">
-        <button class="ws-tool is-active" data-tool="content">Текст</button>
-        <button class="ws-tool" data-tool="video">Видео</button>
-        <button class="ws-tool" data-tool="image">Изображения</button>
-        <button class="ws-tool" data-tool="automate">Автоматизация</button>
+        <button class="ws-tool is-active" data-tool="content" data-i18n="ws.tool.content">Текст</button>
+        <button class="ws-tool" data-tool="video" data-i18n="ws.tool.video">Видео</button>
+        <button class="ws-tool" data-tool="image" data-i18n="ws.tool.image">Изображения</button>
+        <button class="ws-tool" data-tool="automate" data-i18n="ws.tool.automate">Автоматизация</button>
       </nav>
       <div class="ws-history">
-        <div class="ws-history__label">История</div>
+        <div class="ws-history__label" data-i18n="ws.history">История</div>
         <ul id="history-list">
-          <li>Пост для соцсетей</li>
-          <li>Сценарий видео</li>
-          <li>Обложка канала</li>
+          <li data-i18n="ws.h1">Пост для соцсетей</li>
+          <li data-i18n="ws.h2">Сценарий видео</li>
+          <li data-i18n="ws.h3">Обложка канала</li>
         </ul>
       </div>
     </aside>
@@ -179,10 +184,10 @@
       <div class="ws-main__header">
         <span class="ws-main__title" id="ws-title">Генерация текста</span>
       </div>
-      <textarea class="ws-input" id="ws-input" placeholder="Опиши задачу для AI…"></textarea>
-      <button class="btn btn--primary ws-run" id="ws-run">Сгенерировать</button>
+      <textarea class="ws-input" id="ws-input" placeholder="Опиши задачу для AI…" data-i18n-placeholder="ws.input.placeholder"></textarea>
+      <button class="btn btn--primary ws-run" id="ws-run" data-i18n="ws.run">Сгенерировать</button>
       <div class="ws-output" id="ws-output">
-        <p class="ws-output__placeholder">Результат появится здесь.</p>
+        <p class="ws-output__placeholder" data-i18n="ws.out.empty">Результат появится здесь.</p>
       </div>
     </div>
   </div>
@@ -190,13 +195,12 @@
 
 <!-- ============ FINAL CTA ============ -->
 <section class="cta" id="cta">
-  <h2>Твоя идея. Твой инструмент. Твоя AI-платформа.</h2>
-  <button class="btn btn--primary btn--lg">Начать бесплатно</button>
+  <h2 data-i18n="cta.title">Твоя идея. Твой инструмент. Твоя AI-платформа.</h2>
+  <button class="btn btn--primary btn--lg" data-scroll="#workspace" data-i18n="cta.btn">Начать бесплатно</button>
 </section>
 
 <footer class="footer">
-  <span>© 2026 Karino AI</span>
-  <span class="footer__lang" id="lang-switch">RU</span>
+  <span data-i18n="footer.rights">© 2026 Karino AI</span>
 </footer>
 
 <script type="module" src="app.js"></script>
